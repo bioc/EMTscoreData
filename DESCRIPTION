@@ -1,27 +1,39 @@
 Package: EMTscoreData
 Title: Single-cell RNA-seq datasets of EMT responses from Cook et al. (2020)
-Version: 0.99.9
-Authors@R: person("Haimei", "Wen", email = "hudie.luoluo@gmail.com", role = c("aut", "cre"))
-Description: Provides 12 single-cell RNA-seq datasets profiling epithelial mesenchymal transition (EMT) in human cancer cell lines (MCF7, OVCA420, DU145, A549) under TGF-beta stimulation, kinase inhibition, and time-course conditions, as reported in Cook DP & Vanderhyden BC (2020). Data are available as Seurat objects via ExperimentHub..
+Version: 0.99.10
+Authors@R: c(person("Haimei", "Wen", email = "hudie.luoluo@gmail.com", role = c("aut", "cre"),
+    comment = c(ORCID = "0009-0006-1600-1210")),
+    person("Tian", "Hong",
+           role = "fnd"))
+Description: Provides 12 single-cell RNA-seq datasets profiling epithelial–mesenchymal transition (EMT) in human cancer cell lines (MCF7, OVCA420, DU145, and A549) under TGF-beta stimulation, kinase inhibition, and time-course conditions, as reported by Cook DP and Vanderhyden BC (2020). The datasets are distributed via ExperimentHub as SingleCellExperiment objects.
 License: GPL-3
 Imports:
-    ExperimentHub,
-    AnnotationHub,
     SummarizedExperiment,
     Seurat,
     SingleCellExperiment,
+    AnnotationHub,
+    ExperimentHub,
     ggplot2
 Suggests:
+    BiocFileCache,
+    SeuratObject,
+    knitr,
+    rmarkdown,
     googledrive,
     BiocStyle,
-    knitr,
-    rmarkdown
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 biocViews: 
     ExperimentHub,
     SingleCellData,
+    ExpressionData, 
+    CancerData,
+    RNASeqData
+URL: https://github.com/wenmm/EMTscoreData
+BugReports: https://github.com/wenmm/EMTscoreData/issues
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 RoxygenNote: 7.3.3
 NeedsCompilation: no
 Packaged: 2024-08-14 05:29:44 UTC; hwen6
+Config/testthat/edition: 3

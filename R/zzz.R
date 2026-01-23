@@ -21,7 +21,8 @@
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -57,7 +58,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -93,7 +95,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -129,7 +132,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -165,7 +169,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -201,7 +206,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -237,7 +243,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -273,7 +280,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -309,7 +317,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -345,7 +354,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -381,7 +391,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat 
+#' SingleCellExperiment ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -417,7 +428,8 @@ NULL
 #' @references
 #' Cook DP, Vanderhyden BC. Context specificity of the EMT transcriptional
 #' response. \emph{Nature Communications} 2020 May 1;11(1):2142.
-#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment ggplot2 Seurat
+#' @import AnnotationHub ExperimentHub Seurat SingleCellExperiment 
+#' ggplot2 Seurat
 #' @examples
 #' library(ExperimentHub)
 #' eh <- ExperimentHub()
@@ -431,8 +443,8 @@ NULL
 NULL
 
 .onLoad <- function(libname, pkgname) {
-  fl = system.file("extdata", "metadata.csv", package = pkgname)
-  titles = utils::read.csv(fl, stringsAsFactors = FALSE)$Title
+  fl <- system.file("extdata", "metadata.csv", package = pkgname)
+  titles <- utils::read.csv(fl, stringsAsFactors = FALSE)$Title
   
   ExperimentHub::createHubAccessors(pkgname, 'MCF7_TNF')
   ExperimentHub::createHubAccessors(pkgname, 'MCF7_EGF')

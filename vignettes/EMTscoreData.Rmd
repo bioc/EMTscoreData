@@ -38,59 +38,171 @@ library(ExperimentHub)
 library(SummarizedExperiment)
 library(Seurat)
 library(ggplot2)
-eh = ExperimentHub()
+```
+
+## 3.1 Browse all EMTscoreData records
+EMTscoreData registers multiple resources (datasets) on the hub; you can list them first, then download specific ones by their unique ExperimentHub IDs (e.g., EH10291).
+
+`query()` returns a Hub object listing all records matching the keyword.
+This helps you discover what datasets are available and what their IDs are.
+```{r}
+eh <- ExperimentHub()
 query(eh , 'EMTscoreData')
 ```
 
-## Download data using the unique identifier:
+## 3.2 Download data using the unique identifier:
+Below we download three example datasets. These objects are typically SingleCellExperiment, which is the recommended Bioconductor container for single-cell expression data.
 ```{r}
 A549_TNF <- eh[['EH10291']]
 A549_EGF <- eh[['EH10292']]
 A549_TGFB1 <- eh[['EH10293']]
 ```
 
-# 4. Data analysis and visualization
-
-## 4.1 Load gene set data
+Sanity checks: show the class and a brief overview
 ```{r}
-#library("EMTscore")
-#data("Panchy_et_al_E_signature", package = "EMTscore")
-#data("Panchy_et_al_M_signature", package = "EMTscore")
-url <- "https://zenodo.org/records/17917654/files/HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION.v2025.1.Hs.gmt"
-gmt_file <- tempfile(fileext = ".gmt")
-download.file(url, gmt_file, mode = "wb")
+class(A549_TNF)
+A549_TNF
+```
+## 3.3 What is inside a SingleCellExperiment?
+A SingleCellExperiment generally contains:
+assays: expression matrices (e.g., counts, logcounts)
+rowData: feature-level annotation (genes)
+colData: cell-level metadata (e.g., pseudotime, condition, batch)
+(optional) reducedDims: PCA/UMAP embeddings, etc.
+Let’s inspect what assays and metadata columns exist in one dataset:
+```{r}
+#List available assays (common ones: "counts", "logcounts")
+assayNames(A549_TNF)
+```
 
+```{r}
+#List available per-cell metadata fields
+colnames(colData(A549_TNF))
+```
 
+If your dataset includes a pseudotime field, it will typically appear in colData(sce)$Pseudotime (or a similarly named column). The plotting example later assumes a pseudotime column exists; if your column name differs, adjust the time_col argument accordingly.
+
+# 4. Data analysis and visualization
+Some single-cell datasets can be large. Running full analyses on all cells in a vignette may exceed RAM on a typical machine and may fail during package checks.
+Therefore, this vignette uses a small subset of cells from each dataset. This keeps computations fast and demonstrates the workflow without requiring high-memory hardware.
+```{r}
+set.seed(1)
+
+subset_cells <- function(sce, n = 500) {
+n <- min(n, ncol(sce))
+sce[, sample(seq_len(ncol(sce)), n)]
+}
+
+A549_TNF_small <- subset_cells(A549_TNF, n = 1500)
+A549_EGF_small <- subset_cells(A549_EGF, n = 1500)
+A549_TGFB1_small <- subset_cells(A549_TGFB1, n = 1500)
+
+objects <- list(
+A549_TGFB1 = A549_TGFB1_small,
+A549_EGF = A549_EGF_small,
+A549_TNF = A549_TNF_small
+)
+
+#Confirm the reduced size
+
+sapply(objects, ncol)
+```
+## 4.1 Load an EMT gene set (GMT) from Zenodo
+Many EMT scoring methods require a gene set. Here we demonstrate how to download a GMT file from Zenodo and parse it into a simple character vector of genes.
+
+Download the GMT file:
+```{r}
+library(BiocFileCache)
+url <- "https://zenodo.org/records/18168504/files/HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION.v2025.1.Hs.gmt"
+
+bfc <- BiocFileCache() # creates/uses a cache folder
+gmt_file <- bfcrpath(bfc, url) # downloads once; returns the cached file path
+```
+
+Parse GMT and extract EMT genes:
+A GMT file is tab-delimited:
+`GeneSetName \t Description \t GENE1 \t GENE2 \t ...`
+The helper below extracts all genes across gene sets in the GMT and returns unique gene symbols.
+```{r}
 read_gmt <- function(fname){
+  #Read all lines from the GMT file
   gmt_lines <- readLines(fname)
+  #Split each line by tab; each line becomes a character vector
   gmt_list <- lapply(gmt_lines, function(x) unlist(strsplit(x, split="\t")))
+  #For each line, genes start at element 3 (after name and description)
   gmt_genes <- lapply(gmt_list, function(x) x[3:length(x)])
+  #Get unique gene list
   genes <- unique(unlist(gmt_genes))
+  #Return a data frame whose column name is `gene` and whose values are gene names.
   return(data.frame(gene = genes, stringsAsFactors = FALSE))
 }
 
 Genesets <- read_gmt(gmt_file)
+Genesets
 ```
-
 
 ## 4.2 Calculating EMT Scores for Datasets Stored in EMTscoreData
 Calculated EMT scores can then be plotted against pseudotime to examine dynamic changes in epithelial–mesenchymal states.
+
+Because this package is a data package, we keep the computation simple and robust for vignettes.
+Here we compute a demo EMT score defined as the mean log-expression across EMT genes for each cell:
+
+Input: list of SingleCellExperiment/Seurat object + EMT gene vector
+Output: a list of Seurat objects, each containing a new metadata column with one score per cell.
 ```{r}
+## ------------------------------------------------------------------
+## Prepare input objects
+## ------------------------------------------------------------------
+## We first organize the datasets into a named list. Each element
+## corresponds to one experimental condition and contains a Seurat
+## object (or a SingleCellExperiment object that will be converted
+## internally). This unified structure allows us to apply the same
+## EMT scoring procedure to multiple datasets in a consistent way.
+
 objects <- list(
-A549_TGFB1 = A549_TGFB1,
-A549_EGF   = A549_EGF,
-A549_TNF   = A549_TNF
+A549_TGFB1 = A549_TGFB1_small,
+A549_EGF   = A549_EGF_small,
+A549_TNF   = A549_TNF_small
 )
 
+## EMT gene list extracted from the GMT file. These genes define
+## the epithelial–mesenchymal transition (EMT) signature used
+## for score calculation.
 emt_genes <- Genesets$gene
+
+
+## ------------------------------------------------------------------
+## Function: add_EMT_score
+## ------------------------------------------------------------------
+## This function computes an EMT score for each cell in a collection
+## of Seurat (or SingleCellExperiment) objects using a predefined
+## EMT gene set.
+##
+## Input:
+##   - objects: a named list of Seurat objects or SingleCellExperiment
+##              objects. Each object represents one dataset or condition.
+##   - gmt_file: path to a GMT file containing EMT-related genes.
+##   - emt_name: name of the metadata column that will store the EMT score.
+##
+## Output:
+##   - A list of Seurat objects, each containing a new metadata column
+##     with one EMT score per cell.
+##
+## Note:
+##   For demonstration purposes in this vignette, the EMT score is
+##   calculated using Seurat's AddModuleScore function. More advanced
+##   or alternative EMT scoring methods are implemented in the
+##   companion EMTscore package.
 
 add_EMT_score <- function(objects,
                           gmt_file,
                           emt_name = "EMT_Score") {
   
+  ## Read the EMT gene set from the GMT file
   Genesets <- read_gmt(gmt_file)
   emt_genes <- Genesets$gene
   
+  ## Apply EMT scoring to each object in the list
   obj_list <- lapply(names(objects), function(name) {
     
     obj <- objects[[name]]
@@ -104,38 +216,67 @@ add_EMT_score <- function(objects,
       stop("Object ", name, " is not a Seurat or SCE object.")
     }
     
+    ## Update the Seurat object to the current structure if needed.
     obj <- UpdateSeuratObject(obj)
     
     # get gene expression matrix
     geneExp <- GetAssayData(obj, assay = "RNA", layer = "data")
     
-      
+    ## Compute the EMT score using the EMT gene set.
+    ## AddModuleScore returns a column named '<emt_name>1', which we
+    ## subsequently rename for clarity.
     obj <- AddModuleScore(obj, features = list(emt_genes), name = emt_name, ctrl = 5)
-    colnames(obj@meta.data)[colnames(obj@meta.data) == paste0(emt_name, "1")] <- emt_name
-      
-    
+    old <- paste0(emt_name, "1")
+    obj <- SeuratObject::AddMetaData(
+      object   = obj,
+      metadata = obj[[old]][, 1, drop = TRUE],  # 提取为向量
+      col.name = emt_name
+    )
+    obj[[old]] <- NULL
     return(obj)
   })
   
+  
+  ## Preserve original dataset names
   names(obj_list) <- names(objects)
   return(obj_list)
 }
 
+
+## ------------------------------------------------------------------
+## Function: plot_EMT_from_objects
+## ------------------------------------------------------------------
+## This function visualizes EMT scores as a function of pseudotime
+## across multiple datasets.
+##
+## Input:
+##   - obj_list: a list of Seurat objects produced by add_EMT_score().
+##   - col_name: name of the metadata column representing pseudotime.
+##   - emt_score_col: name of the metadata column storing EMT scores.
+##
+## Output:
+##   - A ggplot object showing smoothed EMT score trends along pseudotime
+##     for each experimental condition.
+
 plot_EMT_from_objects <- function(obj_list, col_name,
                                   emt_score_col) {
   
-  # Merge all Seurat object meta.data
+  ## Merge metadata from all Seurat objects into a single data frame
+  ## for visualization.
   plot_df <- do.call(rbind, lapply(names(obj_list), function(name) {
     obj <- obj_list[[name]]
-    df <- obj@meta.data[, c(col_name, emt_score_col), drop = FALSE]
+    df <- obj[[]][, c(col_name, emt_score_col), drop = FALSE]
     colnames(df) <- c(col_name, emt_score_col)
+    ## Track the experimental condition
     df$Condition <- name
+    ## Order cells by pseudotime for smoother visualization
     df <- df[order(df[[col_name]]), ]  
     df
   }))
   
   # Draw smooth curves
-  p <- ggplot(plot_df, aes_string(x = col_name, y = emt_score_col, color = "Condition")) +
+  p <- ggplot(plot_df, aes_string(x = col_name, y = emt_score_col, 
+                                  color = "Condition")) +
     geom_smooth(method = "loess", se = FALSE, linewidth = 1.2) +
     theme_classic(base_size = 14) +
     labs(x = col_name, y = emt_score_col, color = "Condition")
@@ -143,13 +284,23 @@ plot_EMT_from_objects <- function(obj_list, col_name,
   return(p)
 }
 
-seurat_objs <- add_EMT_score(objects, gmt_file = gmt_file, emt_name = "EMT_score")
-p_AUCell <- plot_EMT_from_objects(seurat_objs, col_name = "Pseudotime", emt_score_col = "EMT_score")
-p_AUCell
+## ------------------------------------------------------------------
+## Run EMT scoring and visualization
+## ------------------------------------------------------------------
+## Compute EMT scores for all datasets and visualize their dynamics
+## along pseudotime.
+
+seurat_objs <- add_EMT_score(objects, 
+                             gmt_file = gmt_file,
+                             emt_name = "EMT_score")
+p_Seurat <- plot_EMT_from_objects(seurat_objs, 
+                                  col_name = "Pseudotime", 
+                                  emt_score_col = "EMT_score")
+p_Seurat
 ```
 
 
-
+Session information:
 ```{r}
 sessionInfo()
 ```
